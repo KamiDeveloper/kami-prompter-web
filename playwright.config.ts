@@ -1,7 +1,10 @@
 import { defineConfig, devices } from '@playwright/test'
 
+const includeWebkit = process.env.PLAYWRIGHT_INCLUDE_WEBKIT === '1' || process.env.CI === 'true'
+
 export default defineConfig({
   testDir: './tests/e2e',
+  globalSetup: './tests/e2e/setup/global-setup.ts',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -14,7 +17,7 @@ export default defineConfig({
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'Mobile Chrome', use: { ...devices['Pixel 5'] } },
-    { name: 'Mobile Safari', use: { ...devices['iPhone 13'] } },
+    ...(includeWebkit ? [{ name: 'Mobile Safari', use: { ...devices['iPhone 13'] } }] : []),
   ],
   webServer: {
     command: 'npm run dev',

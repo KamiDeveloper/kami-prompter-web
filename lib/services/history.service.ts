@@ -66,6 +66,32 @@ export async function getUserHistory(
 }
 
 /**
+ * Obtiene una entrada de historial por ID para un usuario especifico.
+ * @param client Cliente Supabase server-side.
+ * @param id ID de la entrada de historial.
+ * @param userId ID del usuario autenticado.
+ * @returns Entrada encontrada o null cuando no existe.
+ */
+export async function getHistoryEntryById(
+  client: SupabaseClient<Database>,
+  id: string,
+  userId: string,
+): Promise<PromptHistory | null> {
+  const { data, error } = await client
+    .from('prompt_history')
+    .select('*')
+    .eq('id', id)
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  if (error) {
+    throw new Error('Unable to fetch history entry')
+  }
+
+  return (data as PromptHistory | null) ?? null
+}
+
+/**
  * Elimina una entrada especifica del historial del usuario.
  * @param client Cliente Supabase server-side.
  * @param id ID de la entrada.

@@ -1,26 +1,137 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Fuentes */
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, 'Cascadia Code', monospace;
+
+  /* Escala de colores base — Dark (default) */
+  --color-bg:              #0a0a0f;
+  --color-surface:         #111118;
+  --color-surface-raised:  #18181f;
+  --color-surface-overlay: #1e1e28;
+  --color-border:          #252530;
+  --color-border-strong:   #32323f;
+
+  /* Texto */
+  --color-text-primary:   #ededf5;
+  --color-text-secondary: #7c7c9a;
+  --color-text-muted:     #454560;
+  --color-text-inverse:   #0a0a0f;
+
+  /* Acento violeta */
+  --color-accent:        #7c3aed;
+  --color-accent-hover:  #6d28d9;
+  --color-accent-light:  #a78bfa;
+  --color-accent-subtle: rgba(124,58,237,0.12);
+  --color-accent-border: rgba(124,58,237,0.30);
+
+  /* Semánticos */
+  --color-success:         #10b981;
+  --color-success-subtle:  rgba(16,185,129,0.12);
+  --color-warning:         #f59e0b;
+  --color-warning-subtle:  rgba(245,158,11,0.12);
+  --color-error:           #ef4444;
+  --color-error-subtle:    rgba(239,68,68,0.12);
+  --color-info:            #3b82f6;
+  --color-info-subtle:     rgba(59,130,246,0.12);
+
+  /* Diff view */
+  --color-diff-added:               rgba(16,185,129,0.14);
+  --color-diff-removed:             rgba(239,68,68,0.14);
+  --color-diff-restructured:        rgba(245,158,11,0.14);
+  --color-diff-added-border:        rgba(16,185,129,0.50);
+  --color-diff-removed-border:      rgba(239,68,68,0.50);
+  --color-diff-restructured-border: rgba(245,158,11,0.50);
+  
+  --color-diff-added-text:          #6ee7b7;
+  --color-diff-removed-text:        #fca5a5;
+  --color-diff-restructured-text:   #fcd34d;
+
+  /* Colores por bloque CREDO */
+  --color-credo-c: #3b82f6;
+  --color-credo-r: #8b5cf6;
+  --color-credo-e: #06b6d4;
+  --color-credo-d: #f59e0b;
+  --color-credo-o: #10b981;
+
+  /* Bordes redondeados */
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-xl:   20px;
+  --radius-full: 9999px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ── Light mode ── */
+.light {
+  --color-bg:              #f5f5fa;
+  --color-surface:         #ffffff;
+  --color-surface-raised:  #ededf5;
+  --color-surface-overlay: #e4e4f0;
+  --color-border:          #dcdce8;
+  --color-border-strong:   #c8c8d8;
+  --color-text-primary:    #0e0e1a;
+  --color-text-secondary:  #5a5a78;
+  --color-text-muted:      #9090aa;
+  --color-text-inverse:    #ffffff;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ── Base ── */
+*, *::before, *::after { box-sizing: border-box; }
+html { height: 100%; }
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-full);
+}
+
+/* Selection */
+::selection {
+  background: var(--color-accent-subtle);
+  color: var(--color-accent-light);
+}
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Skeleton shimmer */
+@keyframes shimmer {
+  from { background-position: 200% center; }
+  to   { background-position: -200% center; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-raised) 25%,
+    var(--color-surface-overlay) 50%,
+    var(--color-surface-raised) 75%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
 }

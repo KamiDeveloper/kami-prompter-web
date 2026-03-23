@@ -10,9 +10,13 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:hooks": "vitest run --config vitest.hooks.config.ts",
+    "test:unit:all": "vitest run && vitest run --config vitest.hooks.config.ts",
     "test:ui": "vitest --ui",
     "e2e": "playwright test",
-    "e2e:ui": "playwright test --ui"
+    "e2e:auth-setup": "playwright test tests/e2e/setup/global-setup.ts",
+    "e2e:ui": "playwright test --ui",
+    "test:all": "npm run test:unit:all && npm run e2e"
   },
   "dependencies": {
     "@google/genai": "^1.46.0",
@@ -38,6 +42,7 @@
     "@vitest/coverage-v8": "^4.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
+    "jsdom": "^29.0.1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.0"
