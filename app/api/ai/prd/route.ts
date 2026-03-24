@@ -46,7 +46,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const geminiClient = new GeminiClient(resolved.apiKey)
+    const geminiClient = new GeminiClient(resolved.apiKey, { allowNsfw: resolved.allowNsfw })
     const userPrompt = [
       `Detail level: ${parsed.data.detailLevel}`,
       `Language: ${parsed.data.language}`,

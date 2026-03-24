@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const geminiClient = new GeminiClient(resolved.apiKey)
+    const geminiClient = new GeminiClient(resolved.apiKey, { allowNsfw: resolved.allowNsfw })
     const userPrompt = [
       'Original prompt:',
       parsed.data.originalPrompt,

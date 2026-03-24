@@ -150,7 +150,7 @@ describe('vault/api-keys', () => {
     const client = createMockSupabaseClient() as MockSupabaseClient
 
     const settingsBuilder = client.__mock.createBuilder()
-    settingsBuilder.maybeSingle.mockResolvedValueOnce(mockSupabaseSuccess({ use_paid_key_for_all: false }))
+    settingsBuilder.maybeSingle.mockResolvedValueOnce(mockSupabaseSuccess({ use_paid_key_for_all: false, show_nsfw: false }))
 
     const keysBuilder = client.__mock.createBuilder()
     keysBuilder.maybeSingle.mockResolvedValueOnce(mockSupabaseSuccess({ vault_secret_id: 's1' }))
@@ -164,39 +164,39 @@ describe('vault/api-keys', () => {
     client.__mock.rpc.mockResolvedValueOnce(mockSupabaseSuccess('flash-key'))
 
     const result = await resolveApiKey({ userId: 'u1', model: 'flash', serviceClient: client })
-    expect(result).toEqual({ apiKey: 'flash-key', keyType: 'flash_free' })
+    expect(result).toEqual({ apiKey: 'flash-key', keyType: 'flash_free', allowNsfw: false })
   })
 
   it('resolveApiKey usa pro_paid cuando model=pro y use_paid_key_for_all=false', async () => {
     const client = createMockSupabaseClient() as MockSupabaseClient
     const settingsBuilder = client.__mock.createBuilder()
-    settingsBuilder.maybeSingle.mockResolvedValueOnce(mockSupabaseSuccess({ use_paid_key_for_all: false }))
+    settingsBuilder.maybeSingle.mockResolvedValueOnce(mockSupabaseSuccess({ use_paid_key_for_all: false, show_nsfw: false }))
     const keysBuilder = client.__mock.createBuilder()
     keysBuilder.maybeSingle.mockResolvedValueOnce(mockSupabaseSuccess({ vault_secret_id: 's2' }))
     client.__mock.from.mockImplementation((table: string) => (table === 'user_settings' ? settingsBuilder : keysBuilder))
     client.__mock.rpc.mockResolvedValueOnce(mockSupabaseSuccess('pro-key'))
 
     const result = await resolveApiKey({ userId: 'u1', model: 'pro', serviceClient: client })
-    expect(result).toEqual({ apiKey: 'pro-key', keyType: 'pro_paid' })
+    expect(result).toEqual({ apiKey: 'pro-key', keyType: 'pro_paid', allowNsfw: false })
   })
 
   it('resolveApiKey usa pro_paid cuando use_paid_key_for_all=true y model=flash', async () => {
     const client = createMockSupabaseClient() as MockSupabaseClient
     const settingsBuilder = client.__mock.createBuilder()
-    settingsBuilder.maybeSingle.mockResolvedValueOnce(mockSupabaseSuccess({ use_paid_key_for_all: true }))
+    settingsBuilder.maybeSingle.mockResolvedValueOnce(mockSupabaseSuccess({ use_paid_key_for_all: true, show_nsfw: true }))
     const keysBuilder = client.__mock.createBuilder()
     keysBuilder.maybeSingle.mockResolvedValueOnce(mockSupabaseSuccess({ vault_secret_id: 's3' }))
     client.__mock.from.mockImplementation((table: string) => (table === 'user_settings' ? settingsBuilder : keysBuilder))
     client.__mock.rpc.mockResolvedValueOnce(mockSupabaseSuccess('pro-key'))
 
     const result = await resolveApiKey({ userId: 'u1', model: 'flash', serviceClient: client })
-    expect(result).toEqual({ apiKey: 'pro-key', keyType: 'pro_paid' })
+    expect(result).toEqual({ apiKey: 'pro-key', keyType: 'pro_paid', allowNsfw: true })
   })
 
   it('resolveApiKey retorna null cuando no hay key disponible', async () => {
     const client = createMockSupabaseClient() as MockSupabaseClient
     const settingsBuilder = client.__mock.createBuilder()
-    settingsBuilder.maybeSingle.mockResolvedValueOnce(mockSupabaseSuccess({ use_paid_key_for_all: false }))
+    settingsBuilder.maybeSingle.mockResolvedValueOnce(mockSupabaseSuccess({ use_paid_key_for_all: false, show_nsfw: false }))
     const keysBuilder = client.__mock.createBuilder()
     keysBuilder.maybeSingle.mockResolvedValueOnce(mockSupabaseSuccess(null))
     client.__mock.from.mockImplementation((table: string) => (table === 'user_settings' ? settingsBuilder : keysBuilder))

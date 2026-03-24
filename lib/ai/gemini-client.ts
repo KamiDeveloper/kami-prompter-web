@@ -1,4 +1,4 @@
-import { GoogleGenAI } from '@google/genai'
+import { GoogleGenAI, HarmBlockThreshold, HarmCategory } from '@google/genai'
 
 import { buildThinkingConfig } from '@/lib/ai/thinking'
 import type { AIError, ModelKey, ThinkingLevelKey } from '@/types'
@@ -9,6 +9,10 @@ interface GenerateParams {
   userPrompt: string
   thinkingLevel: ThinkingLevelKey
   maxOutputTokens?: number
+}
+
+interface GeminiClientOptions {
+  allowNsfw?: boolean
 }
 
 interface GeminiErrorLike {
@@ -105,14 +109,41 @@ export function getModelString(model: ModelKey): 'gemini-3-flash-preview' | 'gem
  */
 export class GeminiClient {
   private readonly ai: GoogleGenAI
+  private readonly allowNsfw: boolean
 
   /**
    * Inicializa el cliente Gemini con API key del usuario.
    * @param apiKey API key privada recuperada desde Vault.
    * @returns Instancia de GeminiClient.
    */
-  constructor(apiKey: string) {
+  constructor(apiKey: string, options: GeminiClientOptions = {}) {
     this.ai = new GoogleGenAI({ apiKey })
+    this.allowNsfw = Boolean(options.allowNsfw)
+  }
+
+  private getSafetySettings() {
+    if (!this.allowNsfw) {
+      return undefined
+    }
+
+    return [
+      {
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,  // Block none
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold: HarmBlockThreshold.BLOCK_NONE,  // Block none
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,  // Block none
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,  // Block none
+      },
+    ]
   }
 
   /**
@@ -138,6 +169,7 @@ export class GeminiClient {
             config: {
               systemInstruction: params.systemPrompt,
               maxOutputTokens: params.maxOutputTokens,
+              safetySettings: this.getSafetySettings(),
               ...buildThinkingConfig(params.thinkingLevel),
             },
           }),
@@ -188,6 +220,7 @@ export class GeminiClient {
             config: {
               systemInstruction: params.systemPrompt,
               maxOutputTokens: params.maxOutputTokens,
+              safetySettings: this.getSafetySettings(),
               ...buildThinkingConfig(params.thinkingLevel),
             },
           }),

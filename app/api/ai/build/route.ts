@@ -53,7 +53,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const geminiClient = new GeminiClient(resolved.apiKey)
+    const geminiClient = new GeminiClient(resolved.apiKey, { allowNsfw: resolved.allowNsfw })
     const userPrompt = [
       'Build and refine a prompt using this CREDO payload:',
       JSON.stringify(parsed.data.credo, null, 2),

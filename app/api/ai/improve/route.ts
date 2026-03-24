@@ -55,7 +55,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const geminiClient = new GeminiClient(resolved.apiKey)
+    const geminiClient = new GeminiClient(resolved.apiKey, { allowNsfw: resolved.allowNsfw })
     const userPrompt = [
       `Intervention level: ${parsed.data.interventionLevel}`,
       'Improve the following prompt while preserving intent:',

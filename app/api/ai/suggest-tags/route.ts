@@ -40,7 +40,13 @@ export async function POST(request: Request) {
       return Response.json({ error: 'API_KEY_NOT_CONFIGURED', keyType: 'flash_free' }, { status: 422 })
     }
 
-    const geminiClient = new GeminiClient(apiKey)
+    const { data: userSettings } = await serviceClient
+      .from('user_settings')
+      .select('show_nsfw')
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    const geminiClient = new GeminiClient(apiKey, { allowNsfw: Boolean(userSettings?.show_nsfw) })
     const userPrompt = [
       `Template name: ${parsed.data.templateName}`,
       `Current tags: ${parsed.data.existingTags.join(', ') || 'none'}`,

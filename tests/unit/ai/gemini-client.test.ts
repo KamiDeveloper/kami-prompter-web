@@ -15,6 +15,12 @@ vi.mock('@google/genai', () => ({
     MEDIUM: 'MEDIUM',
     HIGH: 'HIGH',
   },
+  HarmCategory: {
+    HARM_CATEGORY_SEXUALLY_EXPLICIT: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+  },
+  HarmBlockThreshold: {
+    BLOCK_NONE: 'BLOCK_NONE',
+  },
 }))
 
 import { GeminiClient, getModelString, mapGeminiError } from '@/lib/ai/gemini-client'
@@ -82,6 +88,36 @@ describe('gemini-client', () => {
         thinkingLevel: 'LOW',
       }),
     ).resolves.toBe('hola')
+
+    const firstCallConfig = mockGenerateContent.mock.calls[0][0] as {
+      config?: { safetySettings?: unknown }
+    }
+    expect(firstCallConfig.config?.safetySettings).toBeUndefined()
+  })
+
+  it('generateContent aplica safetySettings cuando NSFW está habilitado', async () => {
+    mockGenerateContent.mockResolvedValueOnce({ text: 'ok' })
+    const client = new GeminiClient('key', { allowNsfw: true })
+
+    await client.generateContent({
+      model: 'gemini-3-flash-preview',
+      systemPrompt: 'sys',
+      userPrompt: 'user',
+      thinkingLevel: 'LOW',
+    })
+
+    const firstCallConfig = mockGenerateContent.mock.calls[0][0] as {
+      config?: {
+        safetySettings?: Array<{ category: string; threshold: string }>
+      }
+    }
+
+    expect(firstCallConfig.config?.safetySettings).toEqual([
+      {
+        category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+        threshold: 'BLOCK_NONE',
+      },
+    ])
   })
 
   it('generateContent reintenta en 429 y luego retorna éxito', async () => {

@@ -183,7 +183,7 @@ export async function resolveApiKey(params: {
   userId: string
   model: ModelKey
   serviceClient: SupabaseClient<Database>
-}): Promise<{ apiKey: string; keyType: KeyType } | null> {
+}): Promise<{ apiKey: string; keyType: KeyType; allowNsfw: boolean } | null> {
   const { userId, model, serviceClient } = params
 
   const settings = await getUserSettings(serviceClient, userId)
@@ -203,5 +203,6 @@ export async function resolveApiKey(params: {
   return {
     apiKey,
     keyType: selectedType,
+    allowNsfw: Boolean(settings?.show_nsfw),
   }
 }

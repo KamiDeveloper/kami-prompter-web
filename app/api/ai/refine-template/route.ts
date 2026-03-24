@@ -46,7 +46,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const geminiClient = new GeminiClient(resolved.apiKey)
+    const geminiClient = new GeminiClient(resolved.apiKey, { allowNsfw: resolved.allowNsfw })
     const userPrompt = `Template prompt to refine:\n${parsed.data.promptContent}`
 
     const raw = await geminiClient.generateContent({
